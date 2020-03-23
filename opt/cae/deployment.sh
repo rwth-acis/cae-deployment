@@ -81,12 +81,12 @@ replaceLinks() {
     dir=$(pwd)
     cd "${ARCHIVE_DIR}/${1}"
     echo "=> Replacing links of widget ${1}"
-    sed -i "s#\\\$STEEN_URL\\\$#${DOCKER_URL}#g" ./js/applicationScript.js
+    sed -i "s#\\\$STEEN_URL\\\$#${DOCKER_URL}/deploybackend#g" ./js/applicationScript.js
     # FIXME: Upon deployment CAE replaces the actual URL with $STEEN_URL:$STEEN_PORT
     #        This removes the path after the host
-    sed -i "s#\\\$STEEN_PORT\\\$#${MICROSERVICE_WEBCONNECTOR_PORT}#g" ./js/applicationScript.js
-    sed -i "s#\\\$WIDGET_URL\\\$#${DOCKER_URL}#g" ./widget.xml
-    sed -i "s#\\\$HTTP_PORT\\\$#${HTTP_PORT}#g" ./widget.xml
+    sed -i "s#:\\\$STEEN_PORT\\\$##g" ./js/applicationScript.js
+    sed -i "s#\\\$WIDGET_URL\\\$#${DOCKER_URL}#g" ./index.html
+    sed -i "s#:\\\$HTTP_PORT\\\$##g" ./index.html
     cd "${dir}"
 }
 
@@ -145,10 +145,17 @@ done
 
 updateServiceHttpPort
 copyWidgets
-#start http server for widgets
-cd "$WIDGETS_DIR"
 npm install http-server -g
+cd "$WIDGETS_DIR"
+#start http server for widgets
 http-server -p $HTTP_PORT &
+for widget in ./frontendComponent-*;do
+    if [ -d "$widget" ]; then
+        cd $widget
+        cp index.html ..
+        break
+    fi
+done
 cd /build
 mkdir bin
 start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
