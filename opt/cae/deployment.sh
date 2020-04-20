@@ -145,7 +145,6 @@ done
 
 updateServiceHttpPort
 copyWidgets
-npm install http-server -g
 cd "$WIDGETS_DIR"
 #start http server for widgets
 http-server -p $HTTP_PORT &

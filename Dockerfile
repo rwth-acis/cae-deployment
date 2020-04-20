@@ -4,7 +4,7 @@ FROM openjdk:8-jdk
 ENV DEBIAN_FRONTEND noninteractive
 
 # Setup node repo
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
 # General update packages
 #RUN sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list
@@ -27,6 +27,8 @@ RUN apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::=
     # rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf && \
     if [ ! -f /usr/share/mysql/my-default.cnf ] ; then cp /etc/mysql/conf.d/mysql.cnf /usr/share/mysql/my-default.cnf; fi && \
     mysql_install_db > /dev/null 2>&1
+
+RUN npm install http-server -g
 
 # Create mount point
 WORKDIR /build
