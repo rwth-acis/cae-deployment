@@ -146,8 +146,8 @@ done
 updateServiceHttpPort
 copyWidgets
 cd "$WIDGETS_DIR"
+
 #start http server for widgets
-http-server -p $HTTP_PORT &
 for widget in ./frontendComponent-*;do
     if [ -d "$widget" ]; then
         cd $widget
@@ -155,8 +155,21 @@ for widget in ./frontendComponent-*;do
         break
     fi
 done
+
+if [ -z "$startCmd"]; then
+    #Start command for microservice(s) is empty. Maybe no microservice exists.
+    #do not start http server as background service (otherwise docker will exit)
+    http-server -p $HTTP_PORT
+else 
+    #Start command for microservice(s) is not empty. Start http server as a background process.
+    http-server -p $HTTP_PORT &
+fi
+
+#the following lines are only executed, if the start command is not empty
+
 cd /build
 mkdir bin
+
 start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
 echo $start_network > /build/bin/start_network.sh
 chmod +x /build/bin/start_network.sh
