@@ -156,7 +156,9 @@ for widget in ./frontendComponent-*;do
     fi
 done
 
-if [ -z "$startCmd"]; then
+cd ..
+
+if [ -z "$startCmd" ]; then
     #Start command for microservice(s) is empty. Maybe no microservice exists.
     #do not start http server as background service (otherwise docker will exit)
     http-server -p $HTTP_PORT
