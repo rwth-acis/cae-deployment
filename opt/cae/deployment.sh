@@ -109,6 +109,29 @@ updateServiceHttpPort() {
     sed -i "s#<service-http-port>#$MICROSERVICE_WEBCONNECTOR_PORT#g" $WEBCONNECTOR_CONFIG_DIR
 }
 
+addMicroservice() {
+    if [ -d "${1}" ]; then
+        echo "Adding microservice from folder ${1}"
+        cd "${1}"
+	    #copy dependencies from lib and service folder of current microservice to the lib and service folder of the application
+	    cp  -a lib/. ${2}
+	    cp  -a service/. ${3}
+	    #import sql data and create tables
+	    for sql in db/*.sql; do
+            if [ -f "$sql" ]; then
+                importSql $sql
+            fi
+	    done
+	    #generate start script
+	    cd etc
+        for DD in ./i5.las2peer.services.*; do
+            cp $DD /build/etc
+	        addServiceToStartScript
+	    done
+	    cd ../..
+    fi
+}
+
 startMySQL
 tail -F $LOG &
 
@@ -121,27 +144,21 @@ createDB
 #fetch and unzip last build artifact from jenkins
 wget $JENKINS_URL/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
 
+echo "Starting microservices now..."
 for D in ./microservice-*; do
-    if [ -d "$D" ]; then
-        cd "$D"
-	#copy dependencies from lib and service folder of current microservice to the lib and service folder of the application
-	cp  -a lib/. ../../lib/
-	cp  -a service/. ../../service/
-	#import sql data and create tables
-	for sql in db/*.sql; do
-            if [ -f "$sql" ]; then
-                importSql $sql
-            fi
-	done
-	#generate start script
-	cd etc
-        for DD in ./i5.las2peer.services.*; do
-            cp $DD /build/etc
-	    addServiceToStartScript
-	done
-	cd ../..
-    fi
+    addMicroservice $D "../../lib/" "../../service/"
 done
+
+if [ -d "dependencies" ]; then
+    echo "Starting external dependencies now..."
+    cd ./dependencies
+    for D in ./*; do 
+        addMicroservice $D "../../../lib/" "../../../service/"
+    done
+    cd ..
+else 
+    echo "Could not find any external dependencies."
+fi
 
 updateServiceHttpPort
 copyWidgets
