@@ -149,12 +149,16 @@ for D in ./microservice-*; do
     addMicroservice $D "../../lib/" "../../service/"
 done
 
-echo "Starting external dependencies now..."
-cd ./dependencies
-for D in ./*; do 
-    addMicroservice $D "../../../lib/" "../../../service/"
-done
-cd ..
+if [ -d "dependencies" ]; then
+    echo "Starting external dependencies now..."
+    cd ./dependencies
+    for D in ./*; do 
+        addMicroservice $D "../../../lib/" "../../../service/"
+    done
+    cd ..
+else 
+    echo "Could not find any external dependencies."
+fi
 
 updateServiceHttpPort
 copyWidgets
