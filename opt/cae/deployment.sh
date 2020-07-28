@@ -152,9 +152,13 @@ done
 if [ -d "dependencies" ]; then
     echo "Starting external dependencies now..."
     cd ./dependencies
-    for D in ./*; do 
-        addMicroservice $D "../../../lib/" "../../../service/"
-    done
+    if [ -d "microservices" ]; then 
+        cd ./microservices
+        for D in ./*; do 
+            addMicroservice $D "../../../../lib/" "../../../../service/"
+        done
+        cd ..
+    fi
     cd ..
 else 
     echo "Could not find any external dependencies."
