@@ -102,6 +102,13 @@ copyWidgets() {
             echo "=> Copied widget $widget"
         fi
     done
+
+    for widget in ./dependencies/frontend/*;do 
+        if [ -d "$widget" ]; then 
+            cp -a "$widget" "$WIDGETS_DIR"
+            echo "=> Copied external dependencies widget $widget"
+        fi
+    done
     cd "$dir"
 }
 
