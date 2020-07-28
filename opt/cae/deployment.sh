@@ -102,6 +102,13 @@ copyWidgets() {
             echo "=> Copied widget $widget"
         fi
     done
+
+    for widget in ./dependencies/frontend/*;do 
+        if [ -d "$widget" ]; then 
+            cp -a "$widget" "$WIDGETS_DIR"
+            echo "=> Copied external dependencies widget $widget"
+        fi
+    done
     cd "$dir"
 }
 
@@ -152,9 +159,13 @@ done
 if [ -d "dependencies" ]; then
     echo "Starting external dependencies now..."
     cd ./dependencies
-    for D in ./*; do 
-        addMicroservice $D "../../../lib/" "../../../service/"
-    done
+    if [ -d "microservices" ]; then 
+        cd ./microservices
+        for D in ./*; do 
+            addMicroservice $D "../../../../lib/" "../../../../service/"
+        done
+        cd ..
+    fi
     cd ..
 else 
     echo "Could not find any external dependencies."
