@@ -149,7 +149,18 @@ createDB
 
 
 #fetch and unzip last build artifact from jenkins
-wget $JENKINS_URL/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
+#Note: Sometimes there is an issue and JENKINS_URL ends with a slash (see https://github.com/rwth-acis/cae-deployment/issues/4).
+#Therefore we first check whether JENKINS_URL ends with a slash or not and depending on that we choose the correct URL to load the artifacts from.
+length=${#JENKINS_URL}
+last_char=${JENKINS_URL:length-1:1}
+
+if [ $last_char = "/" ]; then
+  # last char is slash
+  wget ${JENKINS_URL}job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
+else
+  # last char is no slash
+  wget ${JENKINS_URL}/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
+fi
 
 echo "Starting microservices now..."
 for D in ./microservice-*; do
