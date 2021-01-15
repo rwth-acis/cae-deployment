@@ -156,11 +156,13 @@ last_char=${JENKINS_URL:length-1:1}
 
 if [ $last_char = "/" ]; then
   # last char is slash
-  wget ${JENKINS_URL}job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
+  wget ${JENKINS_URL}job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip
 else
   # last char is no slash
-  wget ${JENKINS_URL}/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip && unzip archive.zip && cd "$ARCHIVE_DIR"
+  wget ${JENKINS_URL}/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip
 fi
+
+unzip -d archive archive.zip && cd "$ARCHIVE_DIR"
 
 echo "Starting microservices now..."
 for D in ./microservice-*; do
