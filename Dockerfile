@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM adoptopenjdk/openjdk14:jdk-14.0.2_12-debian
 
 # Let the container know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
