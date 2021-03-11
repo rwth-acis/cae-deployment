@@ -48,4 +48,7 @@ ENV MICROSERVICE_WEBCONNECTOR_PORT 8086
 ENV MICROSERVICE_PORT 8087
 ENV HTTP_PORT 8088
 
+# Copy archive.zip from build job inside of container
+COPY archive.zip ./
+
 CMD "/opt/cae/deployment.sh"

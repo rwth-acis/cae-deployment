@@ -148,20 +148,20 @@ createMySQLUser
 createDB
 
 
-#fetch and unzip last build artifact from jenkins
-#Note: Sometimes there is an issue and JENKINS_URL ends with a slash (see https://github.com/rwth-acis/cae-deployment/issues/4).
-#Therefore we first check whether JENKINS_URL ends with a slash or not and depending on that we choose the correct URL to load the artifacts from.
-length=${#JENKINS_URL}
-last_char=${JENKINS_URL:length-1:1}
+# Use archive.zip containing all needed files copied from build job inside of cae-deployment folder
+ 
 
-if [ $last_char = "/" ]; then
-  # last char is slash
-  wget ${JENKINS_URL}job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip
-else
-  # last char is no slash
-  wget ${JENKINS_URL}/job/$BUILD_JOB_NAME/lastSuccessfulBuild/artifact/*zip*/archive.zip
-fi
 
+
+
+
+
+
+
+
+
+
+ 
 unzip -d archive archive.zip && cd "$ARCHIVE_DIR"
 
 echo "Starting microservices now..."
