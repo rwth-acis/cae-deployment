@@ -8,12 +8,10 @@ check_if_exists () {
     fi
 }
 
-# check_if_exists "$JENKINS_URL" JENKINS_URL
-# check_if_exists "$BUILD_JOB_NAME" BUILD_JOB_NAME
-check_if_exists "$DOCKER_URL" DOCKER_URL
 check_if_exists "$MICROSERVICE_WEBCONNECTOR_PORT" MICROSERVICE_WEBCONNECTOR_PORT
 check_if_exists "$MICROSERVICE_PORT" MICROSERVICE_PORT
 check_if_exists "$HTTP_PORT" HTTP_PORT
+check_if_exists "$CLUSTER_APPLICATION_LINK" CLUSTER_APPLICATION_LINK
 
 if [ "$ENV_VARIABLE_NOT_SET" = true ] ; then
     echo "Missing environment variables, exiting..."
@@ -33,7 +31,7 @@ startCmd=""
 addServiceToStartScript () {
     serviceName=$(getProperty "service.name")"".$(getProperty "service.class")"@"$(getProperty "service.version")
     echo "=> Add $serviceName to start script"
-    startCmd+=" startService\(\'"$serviceName"\'\)"
+    startCmd+=" startService('"$serviceName"')"
 }
 
 getProperty () {
@@ -81,11 +79,11 @@ replaceLinks() {
     dir=$(pwd)
     cd "${ARCHIVE_DIR}/${1}"
     echo "=> Replacing links of widget ${1}"
-    sed -i "s#\\\$STEEN_URL\\\$#${DOCKER_URL}/deploybackend#g" ./js/applicationScript.js
+    sed -i "s#\\\$STEEN_URL\\\$#${CLUSTER_APPLICATION_LINK}/backend#g" ./js/applicationScript.js
     # FIXME: Upon deployment CAE replaces the actual URL with $STEEN_URL:$STEEN_PORT
     #        This removes the path after the host
     sed -i "s#:\\\$STEEN_PORT\\\$##g" ./js/applicationScript.js
-    sed -i "s#\\\$WIDGET_URL\\\$#${DOCKER_URL}#g" ./index.html
+    sed -i "s#\\\$WIDGET_URL\\\$#${CLUSTER_APPLICATION_LINK}#g" ./index.html
     sed -i "s#:\\\$HTTP_PORT\\\$##g" ./index.html
     cd "${dir}"
 }
@@ -215,14 +213,16 @@ cd /build
 mkdir bin
 
 echo external_address = $(curl -s https://ipinfo.io/ip):${MICROSERVICE_PORT} > etc/pastry.properties
+
 http-server -p 9099 & 
 # start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
 # echo $start_network > /build/bin/start_network.sh
 # chmod +x /build/bin/start_network.sh
 # ./bin/start_network.sh
     java -cp "lib/*" i5.las2peer.tools.L2pNodeLauncher \
-        --service-directory service"$startCmd" \
+        --service-directory service \
         --port $MICROSERVICE_PORT \
         $([ -n "$LAS2PEER_BOOTSTRAP" ] && echo "--bootstrap $LAS2PEER_BOOTSTRAP") \
+        "$startCmd"\
         startWebConnector \
         interactive  2>&1 | tee -a logs
