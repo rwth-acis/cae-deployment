@@ -202,10 +202,10 @@ cd ..
 if [ -z "$startCmd" ]; then
     #Start command for microservice(s) is empty. Maybe no microservice exists.
     #do not start http server as background service (otherwise docker will exit)
-    http-server -p $HTTP_PORT
+    http-server -p 8088
 else 
     #Start command for microservice(s) is not empty. Start http server as a background process.
-    http-server -p $HTTP_PORT &
+    http-server -p 8088 &
     echo "ok"
 fi
 
