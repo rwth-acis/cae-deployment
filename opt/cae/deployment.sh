@@ -8,8 +8,8 @@ check_if_exists () {
     fi
 }
 
-check_if_exists "$JENKINS_URL" JENKINS_URL
-check_if_exists "$BUILD_JOB_NAME" BUILD_JOB_NAME
+# check_if_exists "$JENKINS_URL" JENKINS_URL
+# check_if_exists "$BUILD_JOB_NAME" BUILD_JOB_NAME
 check_if_exists "$DOCKER_URL" DOCKER_URL
 check_if_exists "$MICROSERVICE_WEBCONNECTOR_PORT" MICROSERVICE_WEBCONNECTOR_PORT
 check_if_exists "$MICROSERVICE_PORT" MICROSERVICE_PORT
@@ -206,6 +206,7 @@ if [ -z "$startCmd" ]; then
 else 
     #Start command for microservice(s) is not empty. Start http server as a background process.
     http-server -p $HTTP_PORT &
+    echo "ok"
 fi
 
 #the following lines are only executed, if the start command is not empty
@@ -213,7 +214,15 @@ fi
 cd /build
 mkdir bin
 
-start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
-echo $start_network > /build/bin/start_network.sh
-chmod +x /build/bin/start_network.sh
-./bin/start_network.sh
+echo external_address = $(curl -s https://ipinfo.io/ip):${MICROSERVICE_PORT} > etc/pastry.properties
+http-server -p 9099 & 
+# start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
+# echo $start_network > /build/bin/start_network.sh
+# chmod +x /build/bin/start_network.sh
+# ./bin/start_network.sh
+    java -cp "lib/*" i5.las2peer.tools.L2pNodeLauncher \
+        --service-directory service"$startCmd" \
+        --port $MICROSERVICE_PORT \
+        $([ -n "$LAS2PEER_BOOTSTRAP" ] && echo "--bootstrap $LAS2PEER_BOOTSTRAP") \
+        startWebConnector \
+        interactive  2>&1 | tee -a logs
