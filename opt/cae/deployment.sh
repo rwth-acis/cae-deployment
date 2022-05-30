@@ -213,7 +213,7 @@ fi
 cd /build
 mkdir bin
 
-start_network="java -cp \"lib/*:service/*\" i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
+start_network="java -cp \"lib/*:service/*\" --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED i5.las2peer.tools.L2pNodeLauncher -p "$MICROSERVICE_PORT" uploadStartupDirectory\(\'etc/startup\'\) --service-directory service"$startCmd" startWebConnector"
 echo $start_network > /build/bin/start_network.sh
 chmod +x /build/bin/start_network.sh
 ./bin/start_network.sh
