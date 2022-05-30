@@ -4,7 +4,7 @@ FROM eclipse-temurin:17.0.3_7-jdk
 ENV DEBIAN_FRONTEND noninteractive
 
 # Setup node repo
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 
 # General update packages
 #RUN sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list
@@ -23,7 +23,7 @@ COPY mysql.cnf /etc/mysql/conf.d/mysql.cnf
 COPY mysqld_charset.cnf /etc/mysql/conf.d/mysqld_charset.cnf
 
 #install and configure mysql
-RUN apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes mariadb-server-10.3 && \
+RUN apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes mariadb-server-10.6 && \
     # rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf && \
     if [ ! -f /usr/share/mysql/my-default.cnf ] ; then cp /etc/mysql/conf.d/mysql.cnf /usr/share/mysql/my-default.cnf; fi && \
     mysql_install_db > /dev/null 2>&1
