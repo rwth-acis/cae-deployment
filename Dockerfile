@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.3_7-jdk
+FROM openjdk:17-buster
 
 # Let the container know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
@@ -23,7 +23,7 @@ COPY mysql.cnf /etc/mysql/conf.d/mysql.cnf
 COPY mysqld_charset.cnf /etc/mysql/conf.d/mysqld_charset.cnf
 
 #install and configure mysql
-RUN apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes mariadb-server-10.6 && \
+RUN apt-get -yq install -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes mariadb-server-10.3 && \
     # rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf && \
     if [ ! -f /usr/share/mysql/my-default.cnf ] ; then cp /etc/mysql/conf.d/mysql.cnf /usr/share/mysql/my-default.cnf; fi && \
     mysql_install_db > /dev/null 2>&1
