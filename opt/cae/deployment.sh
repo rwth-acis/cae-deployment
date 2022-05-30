@@ -37,7 +37,7 @@ addServiceToStartScript () {
 }
 
 getProperty () {
-    file="ant_configuration/service.properties"
+    file="../gradle.properties"
     echo `sed '/^\#/d' $file | grep $1  | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'`
 }
 
